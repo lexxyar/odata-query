@@ -1,0 +1,35 @@
+{
+  "name": "@lexxsoft/odata-query",
+  "version": "1.20.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "npx tsc",
+    "watch": "npx tsc -w",
+    "patch": "npm version patch",
+    "minor": "npm version minor",
+    "major": "npm version release",
+    "test": "npm run build && mocha",
+    "mocha": "mocha",
+    "index": "npm run build && node dist/index.js",
+    "doc": "npx typedoc src/index.ts"
+  },
+  "keywords": [
+    "odata",
+    "query",
+    "builder",
+    "typescript"
+  ],
+  "author": "Aleksey Komov",
+  "license": "MIT",
+  "devDependencies": {
+    "mocha": "^8.3.2",
+    "typedoc": "^0.20.35",
+    "typescript": "^4.2.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lexxyar/lexx-odata-query-builder.git"
+  }
+}
