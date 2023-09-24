@@ -30,6 +30,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lexxyar/lexx-odata-query-builder.git"
+    "url": "git+https://github.com/lexxyar/odata-query.git"
   }
 }
