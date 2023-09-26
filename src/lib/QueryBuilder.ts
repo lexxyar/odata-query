@@ -24,12 +24,23 @@ export class QueryBuilder {
     constructor(private _sUrl: string, private _oConfig?: QueryBuilderConfig) {
     }
 
-    static parse(sUrl: string): QueryBuilder {
-        const urlParts = sUrl.split(/\?(.*)/s)
-        urlParts.pop()
-        const qb = new QueryBuilder(urlParts[0])
+    static parse(sUrl: string, fullUrl: boolean = false): QueryBuilder {
+        const urlParts: string[] = sUrl.split(/\?(.*)/s)
+        // urlParts.pop()
+
+        let entityPath: string = urlParts[0]
+        if (!fullUrl) {
+            const regex: RegExp = new RegExp('(?:(?<protocol>[^\\:]*)\\:\\\/\\\/)?(?:(?<user>[^\\:\\@]*)(?:\\:(?<password>[^\\@]*))?\\@)?(?:([^\\\/\\:]*)\\.(?=[^\\.\\\/\\:]*\\.[^\\.\\\/\\:]*))?(?<host>[^\\.\\\/\\:]*)(?:\\.(?<domain>[^\\\/\\.\\:]*))?(?:\\:(?<port>[0-9]*))?(?<path>\\\/[^\\?#]*(?=.*?\\\/)\\\/)?(?<script>[^\\?#]*)?(?:\\?(?<query>[^#]*))?(?:#(?<hash>.*))?', '')
+            const res: RegExpExecArray | null = regex.exec(sUrl)
+            if (res && res.groups && res.groups.script) {
+                entityPath = `${res.groups.script}`
+                entityPath = (entityPath.startsWith('/') ? '' : '/') + entityPath
+            }
+        }
+
+        const qb: QueryBuilder = new QueryBuilder(entityPath)
         if (urlParts.length > 1) {
-            const query = Object.fromEntries(new URLSearchParams(urlParts[1]));
+            const query: { [p: string]: string } = Object.fromEntries(new URLSearchParams(urlParts[1]));
 
             Object.keys(query).map((param: string) => {
                 if (!param.startsWith('$')) {

@@ -224,28 +224,45 @@ describe('oData query builder', function () {
     })
 
     describe('Parsing input http request', function () {
+        it('Parse simple url', function () {
+            const o = QueryBuilder.parse(encodeURI(`${sUrl}`), true)
+            strictEqual(o.build(), `${sUrl}`)
+        });
+        it('Parse url path', function () {
+            const o = QueryBuilder.parse(encodeURI(`/employee`))
+            strictEqual(o.build(), `/employee`)
+        });
         it('Parse input OData url', function () {
-            const o = QueryBuilder.parse(`${sUrl}?$top=7&$limit=4&$filter=name1 eq 'qq?' and startsWith(name2, 'ee') eq true`)
+            const o = QueryBuilder.parse(encodeURI(`${sUrl}?$top=7&$limit=4&$filter=name1 eq 'qq?' and startsWith(name2, 'ee') eq true`), true)
             o.limit(7).shift(4)
             strictEqual(o.build(), `${sUrl}?$top=7&$skip=4&$filter=name1 eq 'qq?' and startswith(name2, 'ee') eq true`)
         });
         it('Parse input OData url with custom params', function () {
-            const o = QueryBuilder.parse(encodeURI(`${sUrl}?$top=7&$skip=4&page=1&$filter=name1 eq 'qq'`))
+            const o = QueryBuilder.parse(encodeURI(`${sUrl}?$top=7&$skip=4&page=1&$filter=name1 eq 'qq'`), true)
             o.limit(7).shift(4)
             strictEqual(o.build(), `${sUrl}?$top=7&$skip=4&$filter=name1 eq 'qq'&page=1`)
         });
         it('Parse input OData url and get filter value', function () {
-            const o = QueryBuilder.parse(encodeURI(`${sUrl}?$top=7&$skip=4&page=1&$filter=name1 eq 'qq'`))
+            const o = QueryBuilder.parse(encodeURI(`${sUrl}?$top=7&$skip=4&page=1&$filter=name1 eq 'qq'`), true)
             o.limit(7).shift(4)
             strictEqual(o.getFilterByField('name1').value, `qq`)
         });
         it('Parse input OData url with inline count', function () {
-            const o = QueryBuilder.parse(encodeURI(`${sUrl}?$count=true`))
+            const o = QueryBuilder.parse(encodeURI(`${sUrl}?$count=true`), true)
             strictEqual(o.build(), `${sUrl}?$count=true`)
         });
         it('Parse input OData url with expand count', function () {
-            const o = QueryBuilder.parse(encodeURI(`${sUrl}?$expand=emails($count=true)`))
+            const o = QueryBuilder.parse(encodeURI(`${sUrl}?$expand=emails($count=true)`), true)
             strictEqual(o.build(), `${sUrl}?$expand=emails($count=true)`)
+        });
+        it('Parse input OData url, getting part only', function () {
+            const o = QueryBuilder.parse(encodeURI(`${sUrl}?$top=7&$limit=4&$filter=name1 eq 'qq?' and startsWith(name2, 'ee') eq true`))
+            o.limit(7).shift(4)
+            strictEqual(o.build(), `/employe?$top=7&$skip=4&$filter=name1 eq 'qq?' and startswith(name2, 'ee') eq true`)
+        });
+        it('Parse input OData url with $count parameter', function () {
+            const o = QueryBuilder.parse(encodeURI(`${sUrl}?$count=true`))
+            strictEqual(o.build(), `/employe?$count=true`)
         });
     })
 
