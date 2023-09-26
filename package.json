@@ -11,6 +11,8 @@
     "minor": "npm version minor",
     "major": "npm version release",
     "test": "npm run build && mocha",
+    "test:cover": "./node_modules/istanbul/lib/cli.js cover ./node_modules/.bin/_mocha",
+    "coverage": "nyc mocha",
     "mocha": "mocha",
     "index": "npm run build && node dist/index.js",
     "doc": "npx typedoc src/index.ts"
@@ -24,7 +26,10 @@
   "author": "Aleksey Komov",
   "license": "MIT",
   "devDependencies": {
-    "mocha": "^8.3.2",
+    "coveralls": "^3.1.1",
+    "istanbul": "^0.4.5",
+    "mocha": "^8.4.0",
+    "nyc": "^15.1.0",
     "typedoc": "^0.20.35",
     "typescript": "^4.2.4"
   },
