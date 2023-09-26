@@ -86,6 +86,10 @@ export class QueryBuilder {
         return this._sUrl
     }
 
+    set url(value: string) {
+        this._sUrl = value
+    }
+
     id(mId: string | number): this {
         this._nId = mId
         return this
