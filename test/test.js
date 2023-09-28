@@ -264,6 +264,10 @@ describe('oData query builder', function () {
             const o = QueryBuilder.parse(encodeURI(`${sUrl}?$count=true`))
             strictEqual(o.build(), `/employe?$count=true`)
         });
+        it('Parse input OData url with $search parameter', function () {
+            const o = QueryBuilder.parse(encodeURI(`${sUrl}?$search=string value`))
+            strictEqual(o.build(), `/employe?$search=string value`)
+        });
     })
 
     describe('Misc', function () {
@@ -276,6 +280,11 @@ describe('oData query builder', function () {
             const o = new QueryBuilder(sUrl)
             o.select(['id', 'name'])
             strictEqual(o.build(), `${sUrl}?$select=id,name`)
+        });
+        it('$search', function () {
+            const o = new QueryBuilder(sUrl)
+            o.search('Some string')
+            strictEqual(o.build(), `${sUrl}?$search=Some string`)
         });
     });
 });

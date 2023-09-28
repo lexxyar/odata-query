@@ -17,6 +17,7 @@
     * [ID](#id)
     * [Select](#select)
     * [Count](#count)
+    * [Search](#search)
     * [File content](#file-content)
 
 # Installation
@@ -231,6 +232,15 @@ o.inlineCount()
 ```
 
 > Output `/users?$count=true
+
+### search
+Free-text search parameter, which was added for OData v4.0
+```js
+const o = new QueryBuilder('/users')
+o.search('John Doe')
+```
+
+> Output `/users?$search=John Doe
 
 ### File content
 
