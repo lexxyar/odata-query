@@ -20,6 +20,7 @@ export class QueryBuilder {
     private _bFileContentBase64 = false
     private _aRequestQuery: Map<string, string> = new Map<string, string>()
     private _inlineCount: boolean = false
+    private _search: string = ''
 
     constructor(private _sUrl: string, private _oConfig?: QueryBuilderConfig) {
     }
@@ -77,6 +78,9 @@ export class QueryBuilder {
             }
             if (Object.keys(query).includes('$count')) {
                 qb._parseCount(query['$count'])
+            }
+            if (Object.keys(query).includes('$search')) {
+                qb._parseSearch(query['$search'])
             }
         }
         return qb
@@ -181,6 +185,11 @@ export class QueryBuilder {
      */
     shift(nValue: number): this {
         return this.offset(nValue)
+    }
+
+    search(value: string): this {
+        this._search = value
+        return this
     }
 
     getFilter(): Array<QueryFilter> {
@@ -356,6 +365,10 @@ export class QueryBuilder {
 
         if (this._aSelect.length > 0) {
             aQuery.push('$select=' + this._aSelect.join(','))
+        }
+
+        if (!!this._search) {
+            aQuery.push(`$search=${this._search}`)
         }
 
         if (this._aRequestQuery.size > 0) {
@@ -535,5 +548,9 @@ export class QueryBuilder {
             return
         }
         this._inlineCount = value.toLowerCase() === 'true'
+    }
+
+    private _parseSearch(value: string) {
+        this.search(value)
     }
 }
