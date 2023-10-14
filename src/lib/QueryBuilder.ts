@@ -379,7 +379,11 @@ export class QueryBuilder {
 
         const sUrl = [this._sUrl]
         if (this._nId) {
-            sUrl.push(`('${this._nId}')`)
+            if (isNaN(+this._nId)) {
+                sUrl.push(`('${this._nId}')`)
+            } else {
+                sUrl.push(`(${this._nId})`)
+            }
             if (this._bFileContent) {
                 sUrl.push(`/_file`)
             } else if (this._bFileContentBase64) {
