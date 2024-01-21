@@ -1,5 +1,8 @@
-import {QueryOrder, QueryOrderDirection} from "./lib/QueryOrder";
-import {QueryFilter, QueryFilterSign, QueryFilterConcatenate} from "./lib/QueryFilter";
+import {QueryOrder} from "./lib/QueryOrder";
+import {QueryOrderDirection} from "./lib/QueryOrderDirection";
+import {QueryFilter} from "./lib/QueryFilter";
+import {QueryFilterSign} from "./lib/QueryFilterSign";
+import {QueryFilterConcatenate} from "./lib/QueryFilterConcatenate";
 import {QueryBuilder} from './lib/QueryBuilder'
 import {QueryExpand} from './lib/QueryExpand'
 

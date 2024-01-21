@@ -1,128 +1,128 @@
-export enum QueryFilterSign {
-    EQ = 'eq',
-    GT = 'gt',
-    GE = 'ge',
-    LT = 'lt',
-    LE = 'le',
-    NE = 'ne',
-    SUBSTRINGOF = "substringof",
-    STARTSWITH = "startswith",
-    ENDSWITH = "endswith",
-}
-
-export enum QueryFilterConcatenate {
-    AND = 'and',
-    OR = 'or'
-}
+import {QueryFilterSign} from "./QueryFilterSign";
+import {QueryFilterConcatenate} from "./QueryFilterConcatenate";
 
 export class QueryFilter {
-    private _sField = ''
-    private _sValue = ''
-    private _sOption: QueryFilterSign = QueryFilterSign.EQ
-    private _sConcat: QueryFilterConcatenate = QueryFilterConcatenate.AND
-    private _aChildFilter: QueryFilter[] = []
+    private _field: string = ''
+    private _value: string = ''
+    private _option: QueryFilterSign = QueryFilterSign.EQ
+    private _concat: QueryFilterConcatenate = QueryFilterConcatenate.AND
+    private _childFilter: QueryFilter[] = []
 
-    get field(): string {
-        return this._sField
+    public static make(field: string | QueryFilter = '', value: any = '', option: QueryFilterSign | string = QueryFilterSign.EQ, concat: QueryFilterConcatenate | string | null = null): QueryFilter {
+        return new QueryFilter(field, value, option, concat)
     }
 
-    get value(): string {
-        return this._sValue.substring(1, this._sValue.length - 1)
-    }
-
-    set value(val: string) {
-        this._sValue = `'${val}'`
-    }
-
-    get option(): string {
-        return this._sOption
-    }
-
-
-    get concat(): QueryFilterConcatenate {
-        return this._sConcat.toLowerCase() === 'and' ? QueryFilterConcatenate.AND : QueryFilterConcatenate.OR
-    }
-
-    set concat(sValue: QueryFilterConcatenate) {
-        this._sConcat = sValue as QueryFilterConcatenate
-    }
-
-    constructor(mField: string | QueryFilter, sValue: any = '', sOption: QueryFilterSign | string = QueryFilterSign.EQ, sConcat: QueryFilterConcatenate | string | null = null) {
-        if (typeof mField === 'string') {
-            this._sField = mField
-            this._sValue = `'${sValue}'`
-            this._sOption = sOption.toLowerCase() as QueryFilterSign
-            if (sConcat !== null) {
-                this._sConcat = sConcat as QueryFilterConcatenate
+    public constructor(field: string | QueryFilter = '', value: any = '', option: QueryFilterSign | string = QueryFilterSign.EQ, concat: QueryFilterConcatenate | string | null = null) {
+        if (typeof field === 'string') {
+            this._field = field
+            this._value = value
+            this._option = option.toLowerCase() as QueryFilterSign
+            if (concat !== null) {
+                this._concat = concat.toLowerCase() as QueryFilterConcatenate
             }
         } else {
-            this._aChildFilter.push(mField)
+            this._childFilter.push(field)
         }
     }
 
-    private _add(oFilter: QueryFilter, sConcat = QueryFilterConcatenate.AND): void {
-        oFilter.concat = sConcat
-        this._aChildFilter.push(oFilter)
+    public field(value: string): this {
+        this._field = value
+        return this
     }
 
-    private _toFilter(sField: string, sValue: any = '', sOption = QueryFilterSign.EQ): QueryFilter {
-        return new QueryFilter(sField, sValue, sOption)
+    public getField(): string {
+        return this._field
     }
 
-    or(mFilter: QueryFilter | string, sValue: any = '', sOption = QueryFilterSign.EQ): void {
-        if (typeof mFilter === 'string') {
-            this._add(this._toFilter(mFilter, sValue, sOption), QueryFilterConcatenate.OR)
+    public getValue(): string {
+        return this._value
+    }
+
+    public value(value: string): this {
+        this._value = value
+        return this
+    }
+
+    public getOption(): string {
+        return this._option
+    }
+
+    public getConcat(): QueryFilterConcatenate {
+        return this._concat.toLowerCase() === 'and' ? QueryFilterConcatenate.AND : QueryFilterConcatenate.OR
+    }
+
+    public concat(value: QueryFilterConcatenate): this {
+        this._concat = value as QueryFilterConcatenate
+        return this
+    }
+
+    private _add(filter: QueryFilter, concat: QueryFilterConcatenate = QueryFilterConcatenate.AND): void {
+        filter.concat(concat)
+        this._childFilter.push(filter)
+    }
+
+    private _toFilter(field: string, value: any = '', option: QueryFilterSign = QueryFilterSign.EQ): QueryFilter {
+        return QueryFilter.make(field, value, option)
+    }
+
+    public or(filter: QueryFilter | string, value: any = '', option: QueryFilterSign = QueryFilterSign.EQ): this {
+        if (typeof filter === 'string') {
+            this._add(this._toFilter(filter, value, option), QueryFilterConcatenate.OR)
         } else {
-            this._add(mFilter, QueryFilterConcatenate.OR)
-        }
-    }
-
-    and(mFilter: QueryFilter | string, sValue: any = '', sOption = QueryFilterSign.EQ): void {
-        if (typeof mFilter === 'string') {
-            this._add(this._toFilter(mFilter, sValue, sOption), QueryFilterConcatenate.AND)
-        } else {
-            this._add(mFilter, QueryFilterConcatenate.AND)
-        }
-    }
-
-    addChild(mFilter: QueryFilter | string, sValue: any = '', sOption = QueryFilterSign.EQ): QueryFilter {
-        if (typeof mFilter === 'string') {
-            this._add(this._toFilter(mFilter, sValue, sOption), QueryFilterConcatenate.AND)
-        } else {
-            this._add(mFilter, mFilter.concat)
+            this._add(filter, QueryFilterConcatenate.OR)
         }
         return this
     }
 
-    build(bWithConcat = false): string {
+    public and(filter: QueryFilter | string, value: any = '', option: QueryFilterSign = QueryFilterSign.EQ): this {
+        if (typeof filter === 'string') {
+            this._add(this._toFilter(filter, value, option), QueryFilterConcatenate.AND)
+        } else {
+            this._add(filter, QueryFilterConcatenate.AND)
+        }
+        return this
+    }
+
+    public addChild(filter: QueryFilter | string, value: any = '', option: QueryFilterSign = QueryFilterSign.EQ): QueryFilter {
+        if (typeof filter === 'string') {
+            this._add(this._toFilter(filter, value, option), QueryFilterConcatenate.AND)
+        } else {
+            this._add(filter, filter.getConcat())
+        }
+        return this
+    }
+
+    public toString(withConcat: boolean = false): string {
         const aFilter = []
-        if (this.field !== '')
-            aFilter.push(this._toString(bWithConcat))
-        this._aChildFilter.filter(item => item.field !== '').map(item => {
-            if (aFilter.length == 0) {
-                aFilter.push(item.build(false))
-            } else {
-                aFilter.push(item.build(true))
-            }
-        })
+        if (this.getField() !== '')
+            aFilter.push(this._toString(withConcat))
+        this._childFilter.filter((item: QueryFilter): boolean => item.getField() !== '')
+            .map((item: QueryFilter): void => {
+                if (aFilter.length == 0) {
+                    aFilter.push(item.toString(false))
+                } else {
+                    aFilter.push(item.toString(true))
+                }
+            })
         return aFilter.join(' ')
     }
 
-    private _toString(bWithConcat = false): string {
-        if (this._sField === '') return ''
-        const aResult = [this._sField, this._sOption, this._sValue]
+    private _toString(withConcat: boolean = false): string {
+        if (this._field === '') return ''
+        const value: string = `'${this._value}'`
+        const aResult: string[] = [this._field, this._option, value]
         if ([
             QueryFilterSign.SUBSTRINGOF,
             QueryFilterSign.STARTSWITH,
             QueryFilterSign.ENDSWITH,
-        ].findIndex((item: string) => this._sOption === item) >= 0) {
-            aResult[0] = `${this._sOption}(${this._sField}, ${this._sValue})`
+        ].findIndex((item: string): boolean => this._option === item) >= 0) {
+            aResult[0] = `${this._option}(${this._field}, ${value})`
             aResult[1] = `eq`
             aResult[2] = `true`
         }
 
-        if (bWithConcat) {
-            aResult.unshift(this._sConcat)
+        if (withConcat) {
+            aResult.unshift(this._concat)
         }
         return aResult.join(' ')
     }

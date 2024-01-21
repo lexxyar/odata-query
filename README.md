@@ -32,7 +32,7 @@ npm i lexx-odata-query-builder
 
 ```js
 const o = new QueryBuilder('http://site.com/api/users')
-o.build()
+o.toString()
 ```
 
 > Output `http://site.com/api/users`
@@ -42,7 +42,7 @@ Or with custom query params
 ```js
 const o = new QueryBuilder('http://site.com/api/users')
 o.querySet('lang', 'en')
-o.build()
+o.toString()
 ```
 
 > Output `http://site.com/api/users?lang=en`
@@ -53,7 +53,7 @@ origin
 ```js
 const o = new QueryBuilder('/users')
 o.querySet('lang', 'en')
-o.build()
+o.toString()
 ```
 
 > Output `/users?lang=en`
@@ -65,7 +65,7 @@ Use `order` method to add order query parameters
 
 ```js
 const o = new QueryBuilder('/users')
-o.order(new QueryOrder('name1')).build()
+o.order(new QueryOrder('name1')).toString()
 ```
 
 > Output `/users?$orderby=name1 asc`
@@ -75,7 +75,7 @@ Also, you can combine several order conditions
 ```js
 const o = new QueryBuilder('/users')
 o.order(new QueryOrder('name1')).order(new QueryOrder('name2', QueryOrderDirection.DESC))
-o.build()
+o.toString()
 ```
 
 > Output `/users?$orderby=name1 asc,name2 desc`
@@ -86,7 +86,7 @@ Use `expand` method to add expand query parameter
 
 ```js
 const o = new QueryBuilder('/users')
-o.expand('company').build()
+o.expand('company').toString()
 ```
 
 > Output `/users?$expand=company`
@@ -95,7 +95,7 @@ Or combine several expand parameters
 
 ```js
 const o = new QueryBuilder('/users')
-o.expand('company').expand('jobtitle').build()
+o.expand('company').expand('jobtitle').toString()
 ```
 
 > Output `/users?$expand=company,jobtitle`
@@ -104,7 +104,7 @@ To add counter to expanding parameter, add `true` as second parameter of `expand
 
 ```js
 const o = new QueryBuilder('/users')
-o.expand('emails', true).build()
+o.expand('emails', true).toString()
 ```
 
 > Output `/users?$expand=company($count=true)`
@@ -117,7 +117,7 @@ For limiting returned data, use `limit` and `offset` methods
 
 ```js
 const o = new QueryBuilder('/users')
-o.top(7).skip(4).build()
+o.top(7).skip(4).toString()
 ```
 
 > Output `/users?$top=7&$skip=4`
@@ -128,7 +128,7 @@ To limit output data by page, use `page` method.
 
 ```js
 const o = new QueryBuilder('/users')
-o.page(3).build()
+o.page(3).toString()
 ```
 
 > Output `/users?$top=10&$skip=20`
@@ -137,7 +137,7 @@ By default, it has 10 records per page, but you free to change in via QueryBuild
 
 ```js
 const o = new QueryBuilder('/users', {rowsPerPage: 5})
-o.page(3).build()
+o.page(3).toString()
 ```
 
 > Output `/users?$top=5&$skip=10`
@@ -151,7 +151,7 @@ methods of QueryFilter to combine them together.
 const oFilter = new QueryFilter('gender', 'f')
 oFilter.and('age', 16, QueryFilterSign.GT)
 const o = new QueryBuilder('/users')
-o.filter(oFilter).build()
+o.filter(oFilter).toString()
 ```
 
 > Output `/users?$filter=gender eq f and age gt 16`
@@ -174,7 +174,7 @@ o.filter(oFilter).build()
 
 ```js
 const o = new QueryBuilder('/users')
-o.count().build()
+o.count().toString()
 ```
 
 > Output `/users/$count`
@@ -185,7 +185,7 @@ Of course, you can use `count` with `filter` for example.
 const oFilter = new QueryFilter('gender', 'f')
 oFilter.and('age', 16, QueryFilterSign.GT)
 const o = new QueryBuilder('/users')
-o.filter(oFilter).count().build()
+o.filter(oFilter).count().toString()
 ```
 
 > Output `/users/$count?$filter=gender eq f and age gt 16`
@@ -196,7 +196,7 @@ ID is primary key of database. Use `id` method to create oData request for singl
 
 ```js
 const o = new QueryBuilder('/users')
-o.id(4).build()
+o.id(4).toString()
 ```
 
 > Output `/users(4)`
@@ -207,7 +207,7 @@ Use `select` method to constrain returned fields
 
 ```js
 const o = new QueryBuilder('/users')
-o.select(['id', 'name']).build()
+o.select(['id', 'name']).toString()
 ```
 
 > Output `/users?$select=id,name`
@@ -253,7 +253,7 @@ To get file content, call `asFileContent` method
 
 ```js
 const o = new QueryBuilder('/files')
-o.id(4).asFileContent().build()
+o.id(4).asFileContent().toString()
 ```
 
 > Output `/files(4)/_file`
@@ -264,7 +264,7 @@ Sometimes needed to get base64 encoded content. Use `asFileContentBase64` method
 
 ```js
 const o = new QueryBuilder('/files')
-o.id(4).asFileContentBase64().build()
+o.id(4).asFileContentBase64().toString()
 ```
 
 > Output `/files(4)/_file64`
@@ -276,7 +276,7 @@ and get instance of QueryBuilder
 
 ```js
 const o = QueryBuilder.parse(`/employee`)
-consle.log(o.build())
+consle.log(o.toString())
 ```
 
 > Output `/employee`
@@ -285,7 +285,7 @@ Or, if you use full url
 
 ```js
 const o = QueryBuilder.parse(`http://site.com/api/users`)
-consle.log(o.build())
+consle.log(o.toString())
 ```
 
 > Output `/users`
@@ -295,7 +295,7 @@ parser save url as is
 
 ```js
 const o = QueryBuilder.parse(`http://site.com/api/users`)
-consle.log(o.build())
+consle.log(o.toString())
 ```
 
 > Output `http://site.com/api/users`
@@ -303,7 +303,7 @@ consle.log(o.build())
 Of-cause, you can use this method to parse url with query
 ```js
 const o = QueryBuilder.parse(`/users?$count=true`)
-consle.log(o.build())
+consle.log(o.toString())
 ```
 
 > Output `/users?$count=true`
