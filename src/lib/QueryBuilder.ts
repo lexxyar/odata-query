@@ -4,17 +4,12 @@ import {QueryExpand} from "./QueryExpand";
 import {QueryFilter} from "./QueryFilter";
 import {QueryFilterSign} from "./QueryFilterSign";
 import {QueryFilterConcatenate} from "./QueryFilterConcatenate";
+import axios, {AxiosRequestConfig, AxiosResponse, Method} from "axios";
+import {IParserFilterStructure, QueryRequestOptions} from "./QueryContracts";
 
-interface IParserFilterStructure {
-    condition: QueryFilterConcatenate
-    field: string
-    group: number
-    operator: QueryFilterSign
-    value: string
-}
+type TData = object | object[]
 
 export class QueryBuilder {
-
     protected _url: string = ''
     protected _select: string[] = []
     protected _limit: number = 0
@@ -27,6 +22,9 @@ export class QueryBuilder {
     protected _filter: QueryFilter[] = []
     protected _id: string | number = 0
     protected _requestQuery: Map<string, string> = new Map<string, string>()
+    protected _data: TData = {}
+    protected _trailingId: boolean = false
+    public processing: boolean = false
 
     public static make(url: string = ''): QueryBuilder {
         return new QueryBuilder(url)
@@ -43,6 +41,11 @@ export class QueryBuilder {
 
     public getUrl(): string {
         return this._url
+    }
+
+    public data(value: TData): this {
+        this._data = value
+        return this
     }
 
     /** SELECT */
@@ -179,6 +182,11 @@ export class QueryBuilder {
     /** ID */
     public id(value: string | number): this {
         this._id = value
+        return this
+    }
+
+    public trailingId(value: boolean = true): this {
+        this._trailingId = value
         return this
     }
 
@@ -527,18 +535,20 @@ export class QueryBuilder {
             })
         }
 
-        const sUrl = [this._url]
+        const sUrl: string[] = [this._url]
         if (this._id) {
+            let idValue: string = ''
             if (isNaN(+this._id)) {
-                sUrl.push(`('${this._id}')`)
+                idValue = `('${this._id}')`
+                // sUrl.push(`('${this._id}')`)
             } else {
-                sUrl.push(`(${this._id})`)
+                idValue = `(${this._id})`
+                // sUrl.push(`(${this._id})`)
             }
-            // if (this._bFileContent) {
-            //     sUrl.push(`/_file`)
-            // } else if (this._bFileContentBase64) {
-            //     sUrl.push(`/_file64`)
-            // }
+            if (this._trailingId) {
+                idValue = `/${this._id}`
+            }
+            sUrl.push(idValue)
         } else {
             sUrl.push(this._count ? '/$count' : '')
         }
@@ -554,9 +564,10 @@ export class QueryBuilder {
     public static parse(url: string, fullUrl: boolean = false): QueryBuilder {
         const urlParts: string[] = url.split(/\?(.*)/s)
 
+        // ToDo fix when used trailing ID
         let entityPath: string = urlParts[0]
         if (!fullUrl) {
-            const regex: RegExp = new RegExp('(?:(?<protocol>[^\\:]*)\\:\\\/\\\/)?(?:(?<user>[^\\:\\@]*)(?:\\:(?<password>[^\\@]*))?\\@)?(?:([^\\\/\\:]*)\\.(?=[^\\.\\\/\\:]*\\.[^\\.\\\/\\:]*))?(?<host>[^\\.\\\/\\:]*)(?:\\.(?<domain>[^\\\/\\.\\:]*))?(?:\\:(?<port>[0-9]*))?(?<path>\\\/[^\\?#]*(?=.*?\\\/)\\\/)?(?<script>[^\\?#]*)?(?:\\?(?<query>[^#]*))?(?:#(?<hash>.*))?', '')
+            const regex: RegExp = new RegExp("(?:(?<protocol>[^\\:]*)\\:\\\/\\\/)?(?:(?<user>[^\\:\\@]*)(?:\\:(?<password>[^\\@]*))?\\@)?(?:([^\\\/\\:]*)\\.(?=[^\\.\\\/\\:]*\\.[^\\.\\\/\\:]*))?(?<host>[^\\.\\\/\\:]*)(?:\\.(?<domain>[^\\\/\\.\\:]*))?(?:\\:(?<port>[0-9]*))?(?<path>\\\/[^\\?#]*(?=.*?\\\/)\\\/)?(?<script>[^\\?#]*)?(?:\\?(?<query>[^#]*))?(?:#(?<hash>.*))?", '')
             const res: RegExpExecArray | null = regex.exec(url)
             if (res && res.groups && res.groups.script) {
                 entityPath = `${res.groups.script}`
@@ -611,4 +622,60 @@ export class QueryBuilder {
         return qb
     }
 
+    public submit(method: Method, options?: Partial<QueryRequestOptions>): void {
+        if (options?.baseUrl) {
+            axios.defaults.baseURL = options.baseUrl
+        }
+
+        this.processing = true
+        if (!!options?.onStart) {
+            options.onStart()
+        }
+
+        const axiosOptions: Partial<AxiosRequestConfig<any>> = {}
+        if (!!options?.headers) {
+            axiosOptions.headers = options.headers
+        }
+        axiosOptions.method = method
+        axiosOptions.url = this.toString()
+        axiosOptions.data = this._data
+
+        axios.request(axiosOptions)
+            .then((response: AxiosResponse<any, any>): void => {
+                if (!!options?.onSuccess) {
+                    options.onSuccess(response)
+                }
+            })
+            .catch((error: any): void => {
+                if (!!options?.onError) {
+                    options.onError(error.response)
+                }
+            })
+            .finally((): void => {
+                this.processing = false
+                if (!!options?.onFinish) {
+                    options.onFinish()
+                }
+            })
+    }
+
+    public get(options?: Partial<QueryRequestOptions>): void {
+        this.submit('get', options)
+    }
+
+    public put(options?: Partial<QueryRequestOptions>): void {
+        this.submit('put', options)
+    }
+
+    public post(options?: Partial<QueryRequestOptions>): void {
+        this.submit('post', options)
+    }
+
+    public delete(options?: Partial<QueryRequestOptions>): void {
+        this.submit('delete', options)
+    }
+
+    public options(options?: Partial<QueryRequestOptions>): void {
+        this.submit('options', options)
+    }
 }

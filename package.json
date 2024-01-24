@@ -36,5 +36,8 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lexxyar/odata-query.git"
+  },
+  "dependencies": {
+    "axios": "^1.6.5"
   }
 }

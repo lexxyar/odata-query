@@ -247,11 +247,37 @@ describe('oData query builder', function () {
         });
     })
 
+    describe('Submit HTTP request', function () {
+        const extUrl = 'https://services.odata.org/TripPinRESTierService/(S(mu3an5u5hoqitqcjzczozvjq))/People'
+        it('External request', function (done) {
+            QueryBuilder.make(extUrl).get({
+                onSuccess(response) {
+                    strictEqual(response.status, 200)
+                    done()
+                }
+            })
+        });
+
+        it('Count', function (done) {
+            QueryBuilder.make(extUrl).count().get({
+                onSuccess(response) {
+                    strictEqual(response.data, 20)
+                    done()
+                }
+            })
+        });
+    });
+
     describe('Misc', function () {
         it('By ID', function () {
             const o = new QueryBuilder(sUrl)
             o.id(4)
             strictEqual(o.toString(), `${sUrl}(4)`)
+        });
+        it('Use trailing ID', function () {
+            const o = new QueryBuilder(sUrl)
+            o.id(4).trailingId()
+            strictEqual(o.toString(), `${sUrl}/4`)
         });
         it('$select', function () {
             const o = new QueryBuilder(sUrl)
