@@ -250,12 +250,12 @@ describe('oData query builder', function () {
     describe('Submit HTTP request', function () {
         const extUrl = 'https://dummyjson.com/products'
         it('External request', function (done) {
-            QueryBuilder.make(extUrl).get({
-                onSuccess(response) {
+            QueryBuilder.make(extUrl)
+                .onSuccess(response => {
                     strictEqual(response.status, 200)
                     done()
-                }
-            })
+                })
+                .get()
         });
     });
 
