@@ -1,15 +1,18 @@
+import cloneDeep from 'lodash.clonedeep'
 import {QueryOrder} from "./QueryOrder";
 import {QueryOrderDirection} from "./QueryOrderDirection";
 import {QueryExpand} from "./QueryExpand";
 import {QueryFilter} from "./QueryFilter";
 import {QueryFilterSign} from "./QueryFilterSign";
 import {QueryFilterConcatenate} from "./QueryFilterConcatenate";
-import axios, {AxiosRequestConfig, AxiosResponse, Method} from "axios";
+import axios, {Axios, AxiosRequestConfig, AxiosResponse, Method} from "axios";
 import {IParserFilterStructure, QueryRequestOptions} from "./QueryContracts";
 
 type TData = object | object[]
 
 export class QueryBuilder {
+    protected static axios: Axios = axios.create()
+
     protected _url: string = ''
     protected _select: string[] = []
     protected _limit: number = 0
@@ -623,11 +626,10 @@ export class QueryBuilder {
     }
 
     public submit(method: Method, options?: Partial<QueryRequestOptions>): void {
+        const axiosInstance = cloneDeep(QueryBuilder.axios)
         if (options?.baseUrl) {
-            axios.defaults.baseURL = options.baseUrl
+            axiosInstance.defaults.baseURL = options.baseUrl
         }
-
-        console.log(axios.defaults)
 
         this.processing = true
         if (!!options?.onStart) {
@@ -642,7 +644,7 @@ export class QueryBuilder {
         axiosOptions.url = this.toString()
         axiosOptions.data = this._data
 
-        axios.request(axiosOptions)
+        axiosInstance.request(axiosOptions)
             .then((response: AxiosResponse<any, any>): void => {
                 if (!!options?.onSuccess) {
                     options.onSuccess(response)

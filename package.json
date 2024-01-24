@@ -26,6 +26,7 @@
   "author": "Aleksey Komov",
   "license": "MIT",
   "devDependencies": {
+    "@types/lodash.clonedeep": "^4.5.9",
     "coveralls": "^3.1.1",
     "istanbul": "^0.4.5",
     "mocha": "^10.2.0",
@@ -38,6 +39,7 @@
     "url": "git+https://github.com/lexxyar/odata-query.git"
   },
   "dependencies": {
-    "axios": "^1.6.5"
+    "axios": "^1.6.5",
+    "lodash.clonedeep": "^4.5.0"
   }
 }
