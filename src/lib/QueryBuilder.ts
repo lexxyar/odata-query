@@ -627,6 +627,8 @@ export class QueryBuilder {
             axios.defaults.baseURL = options.baseUrl
         }
 
+        console.log(axios.defaults)
+
         this.processing = true
         if (!!options?.onStart) {
             options.onStart()
