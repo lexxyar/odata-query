@@ -626,8 +626,9 @@ export class QueryBuilder {
     }
 
     public submit(method: Method, options?: Partial<QueryRequestOptions>): void {
-        const axiosInstance = cloneDeep(QueryBuilder.axios)
+        let axiosInstance: Axios = QueryBuilder.axios
         if (options?.baseUrl) {
+            axiosInstance = cloneDeep(QueryBuilder.axios)
             axiosInstance.defaults.baseURL = options.baseUrl
         }
 
