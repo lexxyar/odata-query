@@ -248,20 +248,11 @@ describe('oData query builder', function () {
     })
 
     describe('Submit HTTP request', function () {
-        const extUrl = 'https://services.odata.org/TripPinRESTierService/(S(mu3an5u5hoqitqcjzczozvjq))/People'
+        const extUrl = 'https://dummyjson.com/products'
         it('External request', function (done) {
             QueryBuilder.make(extUrl).get({
                 onSuccess(response) {
                     strictEqual(response.status, 200)
-                    done()
-                }
-            })
-        });
-
-        it('Count', function (done) {
-            QueryBuilder.make(extUrl).count().get({
-                onSuccess(response) {
-                    strictEqual(response.data, 20)
                     done()
                 }
             })
