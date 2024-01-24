@@ -6,7 +6,12 @@ import {QueryFilter} from "./QueryFilter";
 import {QueryFilterSign} from "./QueryFilterSign";
 import {QueryFilterConcatenate} from "./QueryFilterConcatenate";
 import axios, {Axios, AxiosRequestConfig, AxiosResponse, Method} from "axios";
-import {IParserFilterStructure, QueryRequestOptions} from "./QueryContracts";
+import {
+    CallbackFunctionNoParams,
+    CallbackFunctionOneParam,
+    IParserFilterStructure,
+    QueryRequestOptions
+} from "./QueryContracts";
 
 type TData = object | object[]
 
@@ -27,7 +32,31 @@ export class QueryBuilder {
     protected _requestQuery: Map<string, string> = new Map<string, string>()
     protected _data: TData = {}
     protected _trailingId: boolean = false
+    protected _onErrorCallback: CallbackFunctionOneParam | null = null
+    protected _onSuccessCallback: CallbackFunctionOneParam | null = null
+    protected _onStartCallback: CallbackFunctionNoParams | null = null
+    protected _onFinishCallback: CallbackFunctionNoParams | null = null
     public processing: boolean = false
+
+    public onError(fn: CallbackFunctionOneParam): this {
+        this._onErrorCallback = fn
+        return this
+    }
+
+    public onSuccess(fn: CallbackFunctionOneParam): this {
+        this._onSuccessCallback = fn
+        return this
+    }
+
+    public onStart(fn: CallbackFunctionNoParams): this {
+        this._onStartCallback = fn
+        return this
+    }
+
+    public onFinish(fn: CallbackFunctionNoParams): this {
+        this._onFinishCallback = fn
+        return this
+    }
 
     public static make(url: string = ''): QueryBuilder {
         return new QueryBuilder(url)
@@ -633,9 +662,12 @@ export class QueryBuilder {
         }
 
         this.processing = true
-        if (!!options?.onStart) {
-            options.onStart()
+        if (!!this._onStartCallback) {
+            this._onStartCallback()
         }
+        // if (!!options?.onStart) {
+        //     options.onStart()
+        // }
 
         const axiosOptions: Partial<AxiosRequestConfig<any>> = {}
         if (!!options?.headers) {
@@ -647,20 +679,29 @@ export class QueryBuilder {
 
         axiosInstance.request(axiosOptions)
             .then((response: AxiosResponse<any, any>): void => {
-                if (!!options?.onSuccess) {
-                    options.onSuccess(response)
+                if (!!this._onSuccessCallback) {
+                    this._onSuccessCallback(response)
                 }
+                // if (!!options?.onSuccess) {
+                //     options.onSuccess(response)
+                // }
             })
             .catch((error: any): void => {
-                if (!!options?.onError) {
-                    options.onError(error.response)
+                if (!!this._onErrorCallback) {
+                    this._onErrorCallback(error.response)
                 }
+                // if (!!options?.onError) {
+                //     options.onError(error.response)
+                // }
             })
             .finally((): void => {
                 this.processing = false
-                if (!!options?.onFinish) {
-                    options.onFinish()
+                if (!!this._onFinishCallback) {
+                    this._onFinishCallback()
                 }
+                // if (!!options?.onFinish) {
+                //     options.onFinish()
+                // }
             })
     }
 

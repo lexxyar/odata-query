@@ -6,16 +6,16 @@ type MethodsHeaders = Partial<{
     [Key in Method as Lowercase<Key>]: AxiosHeaders;
 } & { common: AxiosHeaders }>;
 
-type CallbackFunctionNoParams = () => void
-type CallbackFunctionOneParam = (response: AxiosResponse<any, any>) => void
+export type CallbackFunctionNoParams = () => void
+export type CallbackFunctionOneParam = (response: AxiosResponse<any, any>) => void
 
 export interface QueryRequestOptions {
     baseUrl?: string | null
     headers?: (RawAxiosRequestHeaders & MethodsHeaders) | AxiosHeaders
-    onError?: CallbackFunctionOneParam
-    onSuccess?: CallbackFunctionOneParam
-    onStart?: CallbackFunctionNoParams
-    onFinish?: CallbackFunctionNoParams
+    // onError?: CallbackFunctionOneParam
+    // onSuccess?: CallbackFunctionOneParam
+    // onStart?: CallbackFunctionNoParams
+    // onFinish?: CallbackFunctionNoParams
 }
 
 export interface IParserFilterStructure {
