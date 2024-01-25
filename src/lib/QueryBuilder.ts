@@ -16,7 +16,8 @@ import {
 type TData = object | object[]
 
 export class QueryBuilder {
-    protected static axios: Axios = axios.create()
+    public static axios: Axios = axios.create()
+    public static globalLimit: number | null = null
 
     protected _url: string = ''
     protected _select: string[] = []
@@ -518,6 +519,8 @@ export class QueryBuilder {
             if (!this._count) {
                 if (this._limit > 0) {
                     aQuery.push(`$top=${this._limit}`)
+                } else if (QueryBuilder.globalLimit !== null) {
+                    aQuery.push(`$top=${QueryBuilder.globalLimit}`)
                 }
                 if (this._offset > 0) {
                     aQuery.push(`$skip=${this._offset}`)
