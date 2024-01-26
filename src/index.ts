@@ -5,6 +5,7 @@ import {QueryFilterSign} from "./lib/QueryFilterSign";
 import {QueryFilterConcatenate} from "./lib/QueryFilterConcatenate";
 import {QueryBuilder} from './lib/QueryBuilder'
 import {QueryExpand} from './lib/QueryExpand'
+import {QueryBatch} from './lib/QueryBatch'
 
 export {
     QueryOrder,
@@ -13,6 +14,7 @@ export {
     QueryOrderDirection,
     QueryFilterSign,
     QueryExpand,
-    QueryFilterConcatenate
+    QueryFilterConcatenate,
+    QueryBatch,
 }
 
