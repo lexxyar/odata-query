@@ -18,6 +18,7 @@ type TData = object | object[]
 export class QueryBuilder {
     public static axios: Axios = axios.create()
     public static globalLimit: number | null = null
+    public static trailedId: boolean = false
 
     protected _url: string = ''
     protected _select: string[] = []
@@ -575,12 +576,10 @@ export class QueryBuilder {
             let idValue: string = ''
             if (isNaN(+this._id)) {
                 idValue = `('${this._id}')`
-                // sUrl.push(`('${this._id}')`)
             } else {
                 idValue = `(${this._id})`
-                // sUrl.push(`(${this._id})`)
             }
-            if (this._trailingId) {
+            if (this._trailingId || QueryBuilder.trailedId) {
                 idValue = `/${this._id}`
             }
             sUrl.push(idValue)
