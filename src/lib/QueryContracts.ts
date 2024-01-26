@@ -8,6 +8,7 @@ type MethodsHeaders = Partial<{
 
 export type CallbackFunctionNoParams = () => void
 export type CallbackFunctionOneParam = (response: AxiosResponse<any, any>) => void
+export type CallbackFunctionOneParamBatch = (results: PromiseSettledResult<any>[]) => void
 
 export interface QueryRequestOptions {
     baseUrl?: string | null
