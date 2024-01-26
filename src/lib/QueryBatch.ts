@@ -6,30 +6,14 @@ import {
     QueryRequestOptions
 } from "./QueryContracts";
 import {AxiosResponse, Method} from "axios";
+import {HttpRequests} from "../Contracts/HttpRequests";
 
-export class QueryBatch {
+export class QueryBatch extends HttpRequests{
     protected _requests: QueryBuilder[] = []
-    protected _onErrorCallback: CallbackFunctionOneParam | null = null
     protected _onSuccessCallback: CallbackFunctionOneParamBatch | null = null
-    protected _onStartCallback: CallbackFunctionNoParams | null = null
-    protected _onFinishCallback: CallbackFunctionNoParams | null = null
 
     public static make(requests: QueryBuilder[] = []): QueryBatch {
         return new QueryBatch(requests)
-    }
-
-    public constructor(requests: QueryBuilder[] = []) {
-        this._requests = [...requests]
-    }
-
-    public add(request: QueryBuilder): this {
-        this._requests.push(request)
-        return this
-    }
-
-    public onError(fn: CallbackFunctionOneParam): this {
-        this._onErrorCallback = fn
-        return this
     }
 
     public onSuccess(fn: CallbackFunctionOneParamBatch): this {
@@ -37,13 +21,13 @@ export class QueryBatch {
         return this
     }
 
-    public onStart(fn: CallbackFunctionNoParams): this {
-        this._onStartCallback = fn
-        return this
+    public constructor(requests: QueryBuilder[] = []) {
+        super();
+        this._requests = [...requests]
     }
 
-    public onFinish(fn: CallbackFunctionNoParams): this {
-        this._onFinishCallback = fn
+    public add(request: QueryBuilder): this {
+        this._requests.push(request)
         return this
     }
 
@@ -81,44 +65,23 @@ export class QueryBatch {
                         break;
                 }
             }))
-
-            Promise.allSettled(promises)
-                .then((results: PromiseSettledResult<any>[]): void => {
-                    if (this._onSuccessCallback) {
-                        this._onSuccessCallback(results)
-                    }
-                })
-                .catch((reason: any): void => {
-                    if (this._onErrorCallback) {
-                        this._onErrorCallback(reason)
-                    }
-                })
-                .finally((): void => {
-                    if (this._onFinishCallback) {
-                        this._onFinishCallback()
-                    }
-                })
         })
-    }
 
-    public get(options?: Partial<QueryRequestOptions>): void {
-
-        this.submit('get', options)
-    }
-
-    public put(options?: Partial<QueryRequestOptions>): void {
-        this.submit('put', options)
-    }
-
-    public post(options?: Partial<QueryRequestOptions>): void {
-        this.submit('post', options)
-    }
-
-    public delete(options?: Partial<QueryRequestOptions>): void {
-        this.submit('delete', options)
-    }
-
-    public options(options ?: Partial<QueryRequestOptions>): void {
-        this.submit('options', options)
+        Promise.allSettled(promises)
+            .then((results: PromiseSettledResult<any>[]): void => {
+                if (this._onSuccessCallback) {
+                    this._onSuccessCallback(results)
+                }
+            })
+            .catch((reason: any): void => {
+                if (this._onErrorCallback) {
+                    this._onErrorCallback(reason)
+                }
+            })
+            .finally((): void => {
+                if (this._onFinishCallback) {
+                    this._onFinishCallback()
+                }
+            })
     }
 }

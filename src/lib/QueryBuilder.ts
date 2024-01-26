@@ -12,10 +12,11 @@ import {
     IParserFilterStructure,
     QueryRequestOptions
 } from "./QueryContracts";
+import {HttpRequests} from "../Contracts/HttpRequests";
 
 type TData = object | object[]
 
-export class QueryBuilder {
+export class QueryBuilder extends HttpRequests{
     public static axios: Axios = axios.create()
     public static globalLimit: number | null = null
     public static trailedId: boolean = false
@@ -34,29 +35,11 @@ export class QueryBuilder {
     protected _requestQuery: Map<string, string> = new Map<string, string>()
     protected _data: TData = {}
     protected _trailingId: boolean = false
-    protected _onErrorCallback: CallbackFunctionOneParam | null = null
     protected _onSuccessCallback: CallbackFunctionOneParam | null = null
-    protected _onStartCallback: CallbackFunctionNoParams | null = null
-    protected _onFinishCallback: CallbackFunctionNoParams | null = null
     public processing: boolean = false
-
-    public onError(fn: CallbackFunctionOneParam): this {
-        this._onErrorCallback = fn
-        return this
-    }
 
     public onSuccess(fn: CallbackFunctionOneParam): this {
         this._onSuccessCallback = fn
-        return this
-    }
-
-    public onStart(fn: CallbackFunctionNoParams): this {
-        this._onStartCallback = fn
-        return this
-    }
-
-    public onFinish(fn: CallbackFunctionNoParams): this {
-        this._onFinishCallback = fn
         return this
     }
 
@@ -65,6 +48,7 @@ export class QueryBuilder {
     }
 
     public constructor(url: string = '') {
+        super();
         this._url = url
     }
 
@@ -667,9 +651,6 @@ export class QueryBuilder {
         if (!!this._onStartCallback) {
             this._onStartCallback()
         }
-        // if (!!options?.onStart) {
-        //     options.onStart()
-        // }
 
         const axiosOptions: Partial<AxiosRequestConfig<any>> = {}
         if (!!options?.headers) {
@@ -684,46 +665,17 @@ export class QueryBuilder {
                 if (!!this._onSuccessCallback) {
                     this._onSuccessCallback(response)
                 }
-                // if (!!options?.onSuccess) {
-                //     options.onSuccess(response)
-                // }
             })
             .catch((error: any): void => {
                 if (!!this._onErrorCallback) {
                     this._onErrorCallback(error.response)
                 }
-                // if (!!options?.onError) {
-                //     options.onError(error.response)
-                // }
             })
             .finally((): void => {
                 this.processing = false
                 if (!!this._onFinishCallback) {
                     this._onFinishCallback()
                 }
-                // if (!!options?.onFinish) {
-                //     options.onFinish()
-                // }
             })
-    }
-
-    public get(options?: Partial<QueryRequestOptions>): void {
-        this.submit('get', options)
-    }
-
-    public put(options?: Partial<QueryRequestOptions>): void {
-        this.submit('put', options)
-    }
-
-    public post(options?: Partial<QueryRequestOptions>): void {
-        this.submit('post', options)
-    }
-
-    public delete(options?: Partial<QueryRequestOptions>): void {
-        this.submit('delete', options)
-    }
-
-    public options(options?: Partial<QueryRequestOptions>): void {
-        this.submit('options', options)
     }
 }
