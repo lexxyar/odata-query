@@ -16,7 +16,7 @@ import {HttpRequests} from "../Contracts/HttpRequests";
 
 type TData = object | object[]
 
-export class QueryBuilder extends HttpRequests{
+export class QueryBuilder extends HttpRequests {
     public static axios: Axios = axios.create()
     public static globalLimit: number | null = null
     public static trailedId: boolean = false
@@ -36,6 +36,7 @@ export class QueryBuilder extends HttpRequests{
     protected _data: TData = {}
     protected _trailingId: boolean = false
     protected _onSuccessCallback: CallbackFunctionOneParam | null = null
+    protected _method: Method = 'get'
     public processing: boolean = false
 
     public onSuccess(fn: CallbackFunctionOneParam): this {
@@ -500,53 +501,55 @@ export class QueryBuilder extends HttpRequests{
 
     public toString(): string {
         const aQuery: string[] = []
-        if (!this._id) {
-            if (!this._count) {
-                if (this._limit > 0) {
-                    aQuery.push(`$top=${this._limit}`)
-                } else if (QueryBuilder.globalLimit !== null) {
-                    aQuery.push(`$top=${QueryBuilder.globalLimit}`)
+        if (this._method === 'get') {
+            if (!this._id) {
+                if (!this._count) {
+                    if (this._limit > 0) {
+                        aQuery.push(`$top=${this._limit}`)
+                    } else if (QueryBuilder.globalLimit !== null) {
+                        aQuery.push(`$top=${QueryBuilder.globalLimit}`)
+                    }
+                    if (this._offset > 0) {
+                        aQuery.push(`$skip=${this._offset}`)
+                    }
+                    if (this._inlineCount) {
+                        aQuery.push(`$count=true`)
+                    }
+                    if (this._order.length > 0) {
+                        const aOrder: string[] = []
+                        this._order.map((oOrder: QueryOrder): void => {
+                            aOrder.push(oOrder.toString())
+                        })
+                        aQuery.push('$orderby=' + aOrder.join(','))
+                    }
                 }
-                if (this._offset > 0) {
-                    aQuery.push(`$skip=${this._offset}`)
-                }
-                if (this._inlineCount) {
-                    aQuery.push(`$count=true`)
-                }
-                if (this._order.length > 0) {
-                    const aOrder: string[] = []
-                    this._order.map((oOrder: QueryOrder): void => {
-                        aOrder.push(oOrder.toString())
+                // if (this._oFilter !== null) {
+                //     aQuery.push('$filter=' + this._oFilter.toString())
+                // }
+                if (this._filter.length > 0) {
+                    const filter: QueryFilter = QueryFilter.make('')
+                    this._filter.map((f: QueryFilter): void => {
+                        filter.addChild(f)
                     })
-                    aQuery.push('$orderby=' + aOrder.join(','))
+                    aQuery.push('$filter=' + filter.toString())
                 }
             }
-            // if (this._oFilter !== null) {
-            //     aQuery.push('$filter=' + this._oFilter.toString())
-            // }
-            if (this._filter.length > 0) {
-                const filter: QueryFilter = QueryFilter.make('')
-                this._filter.map((f: QueryFilter): void => {
-                    filter.addChild(f)
+
+            if (this._expand.length > 0) {
+                const expands: string[] = []
+                this._expand.map((exp: QueryExpand): void => {
+                    expands.push(exp.toString())
                 })
-                aQuery.push('$filter=' + filter.toString())
+                aQuery.push('$expand=' + expands.join(','))
             }
-        }
 
-        if (this._expand.length > 0) {
-            const expands: string[] = []
-            this._expand.map((exp: QueryExpand): void => {
-                expands.push(exp.toString())
-            })
-            aQuery.push('$expand=' + expands.join(','))
-        }
+            if (this._select.length > 0) {
+                aQuery.push('$select=' + this._select.join(','))
+            }
 
-        if (this._select.length > 0) {
-            aQuery.push('$select=' + this._select.join(','))
-        }
-
-        if (!!this._search) {
-            aQuery.push(`$search=${this._search}`)
+            if (!!this._search) {
+                aQuery.push(`$search=${this._search}`)
+            }
         }
 
         if (this._requestQuery.size > 0) {
@@ -657,6 +660,7 @@ export class QueryBuilder extends HttpRequests{
             axiosOptions.headers = options.headers
         }
         axiosOptions.method = method
+        this._method = method
         axiosOptions.url = this.toString()
         axiosOptions.data = this._data
 
