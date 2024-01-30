@@ -7,7 +7,6 @@ import {QueryFilterSign} from "./QueryFilterSign";
 import {QueryFilterConcatenate} from "./QueryFilterConcatenate";
 import axios, {Axios, AxiosRequestConfig, AxiosResponse, Method} from "axios";
 import {
-    CallbackFunctionNoParams,
     CallbackFunctionOneParam,
     IParserFilterStructure,
     QueryRequestOptions
@@ -37,6 +36,7 @@ export class QueryBuilder extends HttpRequests {
     protected _trailingId: boolean = false
     protected _onSuccessCallback: CallbackFunctionOneParam | null = null
     protected _method: Method = 'get'
+    protected _noLimitManually: boolean = false
     public processing: boolean = false
 
     public onSuccess(fn: CallbackFunctionOneParam): this {
@@ -108,6 +108,7 @@ export class QueryBuilder extends HttpRequests {
 
     public noLimit(): this {
         this._limit = 0
+        this._noLimitManually = true
         return this
     }
 
@@ -506,7 +507,7 @@ export class QueryBuilder extends HttpRequests {
                 if (!this._count) {
                     if (this._limit > 0) {
                         aQuery.push(`$top=${this._limit}`)
-                    } else if (QueryBuilder.globalLimit !== null) {
+                    } else if (QueryBuilder.globalLimit !== null && !this._noLimitManually) {
                         aQuery.push(`$top=${QueryBuilder.globalLimit}`)
                     }
                     if (this._offset > 0) {
@@ -523,9 +524,6 @@ export class QueryBuilder extends HttpRequests {
                         aQuery.push('$orderby=' + aOrder.join(','))
                     }
                 }
-                // if (this._oFilter !== null) {
-                //     aQuery.push('$filter=' + this._oFilter.toString())
-                // }
                 if (this._filter.length > 0) {
                     const filter: QueryFilter = QueryFilter.make('')
                     this._filter.map((f: QueryFilter): void => {
