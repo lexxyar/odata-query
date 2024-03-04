@@ -5,7 +5,7 @@ import {QueryExpand} from "./QueryExpand";
 import {QueryFilter} from "./QueryFilter";
 import {QueryFilterSign} from "./QueryFilterSign";
 import {QueryFilterConcatenate} from "./QueryFilterConcatenate";
-import axios, {Axios, AxiosRequestConfig, AxiosResponse, Method} from "axios";
+import axios, {Axios, AxiosProgressEvent, AxiosRequestConfig, AxiosResponse, Method} from "axios";
 import {
     CallbackFunctionOneParam,
     IParserFilterStructure,
@@ -663,7 +663,8 @@ export class QueryBuilder extends HttpRequests {
         axiosOptions.data = this._data
 
         if (!!this._onUploadProgressCallback) {
-            axiosOptions.onUploadProgress = this._onUploadProgressCallback
+            // @ts-ignore
+            axiosOptions.onUploadProgress = (e:AxiosProgressEvent)=>this._onUploadProgressCallback(e, this._uid)
         }
         if (!!this._onDownloadProgressCallback) {
             axiosOptions.onDownloadProgress = this._onDownloadProgressCallback
