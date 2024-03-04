@@ -662,6 +662,13 @@ export class QueryBuilder extends HttpRequests {
         axiosOptions.url = this.toString()
         axiosOptions.data = this._data
 
+        if (!!this._onUploadProgressCallback) {
+            axiosOptions.onUploadProgress = this._onUploadProgressCallback
+        }
+        if (!!this._onDownloadProgressCallback) {
+            axiosOptions.onDownloadProgress = this._onDownloadProgressCallback
+        }
+
         axiosInstance.request(axiosOptions)
             .then((response: AxiosResponse<any, any>): void => {
                 if (!!this._onSuccessCallback) {

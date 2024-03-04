@@ -1,4 +1,4 @@
-import {AxiosHeaders, AxiosResponse, Method, RawAxiosRequestHeaders} from "axios";
+import {AxiosHeaders, AxiosProgressEvent, AxiosResponse, Method, RawAxiosRequestHeaders} from "axios";
 import {QueryFilterConcatenate} from "./QueryFilterConcatenate";
 import {QueryFilterSign} from "./QueryFilterSign";
 
@@ -8,15 +8,15 @@ type MethodsHeaders = Partial<{
 
 export type CallbackFunctionNoParams = () => void
 export type CallbackFunctionOneParam = (response: AxiosResponse<any, any>) => void
+export type CallbackFunctionUploadProgress = (event: AxiosProgressEvent) => void
+export type CallbackFunctionDownloadProgress = (event: AxiosProgressEvent) => void
 export type CallbackFunctionOneParamBatch = (results: PromiseSettledResult<any>[]) => void
 
 export interface QueryRequestOptions {
     baseUrl?: string | null
     headers?: (RawAxiosRequestHeaders & MethodsHeaders) | AxiosHeaders
-    // onError?: CallbackFunctionOneParam
-    // onSuccess?: CallbackFunctionOneParam
-    // onStart?: CallbackFunctionNoParams
-    // onFinish?: CallbackFunctionNoParams
+    // onUploadProgress?: CallbackFunctionUploadProgress | null
+    // onDownloadProgress?: CallbackFunctionDownloadProgress | null
 }
 
 export interface IParserFilterStructure {

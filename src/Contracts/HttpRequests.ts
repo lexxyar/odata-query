@@ -1,6 +1,7 @@
 import {
+    CallbackFunctionDownloadProgress,
     CallbackFunctionNoParams,
-    CallbackFunctionOneParam,
+    CallbackFunctionOneParam, CallbackFunctionUploadProgress,
     QueryRequestOptions
 } from "../lib/QueryContracts";
 import {Method} from "axios/index";
@@ -10,8 +11,20 @@ export abstract class HttpRequests {
     protected _onSuccessCallback: any | null = null
     protected _onStartCallback: CallbackFunctionNoParams | null = null
     protected _onFinishCallback: CallbackFunctionNoParams | null = null
+    protected _onUploadProgressCallback: CallbackFunctionUploadProgress | null = null
+    protected _onDownloadProgressCallback: CallbackFunctionDownloadProgress | null = null
 
     public abstract submit(method: Method, options?: Partial<QueryRequestOptions>): void
+
+    public onUploadProgress(fn: CallbackFunctionUploadProgress): this {
+        this._onUploadProgressCallback = fn
+        return this
+    }
+
+    public onDownloadProgress(fn: CallbackFunctionDownloadProgress): this {
+        this._onDownloadProgressCallback = fn
+        return this
+    }
 
     public onError(fn: CallbackFunctionOneParam): this {
         this._onErrorCallback = fn
