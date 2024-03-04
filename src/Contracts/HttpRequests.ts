@@ -26,7 +26,7 @@ export abstract class HttpRequests {
     }
 
     public onUploadProgress(fn: CallbackFunctionUploadProgress): this {
-        this._onUploadProgressCallback = fn
+        this._onUploadProgressCallback = (id: any) => fn
         return this
     }
 
