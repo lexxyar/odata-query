@@ -4,7 +4,7 @@ import {
     CallbackFunctionOneParam, CallbackFunctionUploadProgress,
     QueryRequestOptions
 } from "../lib/QueryContracts";
-import {Method} from "axios";
+import {AxiosProgressEvent, Method} from "axios";
 
 export abstract class HttpRequests {
     protected _uid: string = '';
@@ -26,7 +26,7 @@ export abstract class HttpRequests {
     }
 
     public onUploadProgress(fn: CallbackFunctionUploadProgress): this {
-        this._onUploadProgressCallback = (id: any) => fn
+        this._onUploadProgressCallback = (event:AxiosProgressEvent)=>fn(event, this._uid)
         return this
     }
 

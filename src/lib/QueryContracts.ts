@@ -8,7 +8,7 @@ type MethodsHeaders = Partial<{
 
 export type CallbackFunctionNoParams = () => void
 export type CallbackFunctionOneParam = (response: AxiosResponse<any, any>) => void
-export type CallbackFunctionUploadProgress = (event: AxiosProgressEvent) => void
+export type CallbackFunctionUploadProgress = (event: AxiosProgressEvent, id: string) => void
 export type CallbackFunctionDownloadProgress = (event: AxiosProgressEvent) => void
 export type CallbackFunctionOneParamBatch = (results: PromiseSettledResult<any>[]) => void
 
