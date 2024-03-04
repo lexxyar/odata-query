@@ -5,6 +5,7 @@ import {
     QueryRequestOptions
 } from "../lib/QueryContracts";
 import {AxiosProgressEvent, Method} from "axios";
+import {v4 as uuidv4} from 'uuid';
 
 export abstract class HttpRequests {
     protected _uid: string = '';
@@ -18,7 +19,7 @@ export abstract class HttpRequests {
     public abstract submit(method: Method, options?: Partial<QueryRequestOptions>): void
 
     public constructor() {
-        this._uid = Math.random().toString(36).slice(-8)
+        this._uid = uuidv4()
     }
 
     public getUid(): string {
@@ -26,7 +27,7 @@ export abstract class HttpRequests {
     }
 
     public onUploadProgress(fn: CallbackFunctionUploadProgress): this {
-        this._onUploadProgressCallback = (event:AxiosProgressEvent)=>fn(event, this._uid)
+        this._onUploadProgressCallback = (event: AxiosProgressEvent) => fn(event, this._uid)
         return this
     }
 
