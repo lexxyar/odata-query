@@ -4,9 +4,10 @@ import {
     CallbackFunctionOneParam, CallbackFunctionUploadProgress,
     QueryRequestOptions
 } from "../lib/QueryContracts";
-import {Method} from "axios/index";
+import {Method} from "axios";
 
 export abstract class HttpRequests {
+    protected _uid: string = '';
     protected _onErrorCallback: CallbackFunctionOneParam | null = null
     protected _onSuccessCallback: any | null = null
     protected _onStartCallback: CallbackFunctionNoParams | null = null
@@ -15,6 +16,14 @@ export abstract class HttpRequests {
     protected _onDownloadProgressCallback: CallbackFunctionDownloadProgress | null = null
 
     public abstract submit(method: Method, options?: Partial<QueryRequestOptions>): void
+
+    public constructor() {
+        this._uid = Math.random().toString(36).slice(-8)
+    }
+
+    public getUid(): string {
+        return this._uid
+    }
 
     public onUploadProgress(fn: CallbackFunctionUploadProgress): this {
         this._onUploadProgressCallback = fn
