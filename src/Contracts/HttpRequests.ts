@@ -26,6 +26,11 @@ export abstract class HttpRequests {
         return this._uid
     }
 
+    public setUid(value: string): this {
+        this._uid = value
+        return this
+    }
+
     public onUploadProgress(fn: CallbackFunctionUploadProgress): this {
         this._onUploadProgressCallback = (event: AxiosProgressEvent) => fn(event, this._uid)
         return this
