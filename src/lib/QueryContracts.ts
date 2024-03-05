@@ -8,15 +8,13 @@ type MethodsHeaders = Partial<{
 
 export type CallbackFunctionNoParams = () => void
 export type CallbackFunctionOneParam = (response: AxiosResponse<any, any>) => void
-export type CallbackFunctionUploadProgress = (event: AxiosProgressEvent, id: string) => void
+export type CallbackFunctionUploadProgress = (event: AxiosProgressEvent) => void
 export type CallbackFunctionDownloadProgress = (event: AxiosProgressEvent) => void
 export type CallbackFunctionOneParamBatch = (results: PromiseSettledResult<any>[]) => void
 
 export interface QueryRequestOptions {
     baseUrl?: string | null
     headers?: (RawAxiosRequestHeaders & MethodsHeaders) | AxiosHeaders
-    // onUploadProgress?: CallbackFunctionUploadProgress | null
-    // onDownloadProgress?: CallbackFunctionDownloadProgress | null
 }
 
 export interface IParserFilterStructure {
