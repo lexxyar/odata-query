@@ -2,9 +2,7 @@ import {
     CallbackFunctionDownloadProgress,
     CallbackFunctionOneParam,
     CallbackFunctionUploadProgress,
-    QueryRequestOptions
 } from "../lib/QueryContracts";
-// import {AxiosResponse, Method} from "axios";
 import {HttpRequestState} from "./HttpRequestState";
 
 export abstract class HttpRequests extends HttpRequestState {

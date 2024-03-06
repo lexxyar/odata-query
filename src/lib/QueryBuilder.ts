@@ -7,9 +7,9 @@ import {QueryFilterSign} from "./QueryFilterSign";
 import {QueryFilterConcatenate} from "./QueryFilterConcatenate";
 import axios, {Axios, AxiosProgressEvent, AxiosRequestConfig, AxiosResponse, Method} from "axios";
 import {
-    CallbackFunctionOneParam,
+    CallbackFunctionOneParam, CallbackFunctionStateChange,
     IParserFilterStructure,
-    QueryRequestOptions
+    QueryRequestOptions, TQueryBuilderState
 } from "./QueryContracts";
 import {HttpRequests} from "../Contracts/HttpRequests";
 
@@ -35,12 +35,29 @@ export class QueryBuilder extends HttpRequests {
     protected _data: TData = {}
     protected _trailingId: boolean = false
     protected _onSuccessCallback: CallbackFunctionOneParam | null = null
+    protected _onStateChangeInternalCallback: CallbackFunctionStateChange | null = null
+    protected _onStateChangeCallback: CallbackFunctionStateChange | null = null
     protected _method: Method = 'get'
     protected _noLimitManually: boolean = false
+    protected _state: TQueryBuilderState = 'New'
     public processing: boolean = false
+
+    public get state(): TQueryBuilderState {
+        return this._state
+    }
 
     public onSuccess(fn: CallbackFunctionOneParam): this {
         this._onSuccessCallback = fn
+        return this
+    }
+
+    public onStateChangeInternal(fn: CallbackFunctionStateChange): this {
+        this._onStateChangeInternalCallback = fn
+        return this
+    }
+
+    public onStateChange(fn: CallbackFunctionStateChange): this {
+        this._onStateChangeCallback = fn
         return this
     }
 
@@ -50,6 +67,7 @@ export class QueryBuilder extends HttpRequests {
 
     public constructor(url: string = '') {
         super();
+        this._state = 'New'
         this._url = url
     }
 
@@ -641,7 +659,19 @@ export class QueryBuilder extends HttpRequests {
         return qb
     }
 
-    public submit(method: Method, options?: Partial<QueryRequestOptions>): Promise<void> {
+    protected _onStateChangeHandle(): void {
+        if (this._onStateChangeInternalCallback) {
+            this._onStateChangeInternalCallback(this._state)
+        }
+        if (this._onStateChangeCallback) {
+            this._onStateChangeCallback(this._state)
+        }
+    }
+
+    public submit(method: Method, options?: Partial<QueryRequestOptions>): void {
+        this._state = 'Run'
+        this._onStateChangeHandle()
+
         let axiosInstance: Axios = QueryBuilder.axios
         if (options?.baseUrl) {
             axiosInstance = cloneDeep(QueryBuilder.axios)
@@ -663,25 +693,26 @@ export class QueryBuilder extends HttpRequests {
         axiosOptions.data = this._data
 
         if (!!this._onUploadProgressCallback) {
-            // @ts-ignore
-            axiosOptions.onUploadProgress = (e: AxiosProgressEvent) => this._onUploadProgressCallback(e, this._uid)
+            axiosOptions.onUploadProgress = this._onUploadProgressCallback
         }
         if (!!this._onDownloadProgressCallback) {
             axiosOptions.onDownloadProgress = this._onDownloadProgressCallback
         }
 
-        let errorValue: any = false
         axiosInstance.request(axiosOptions)
             .then((response: AxiosResponse<any, any>): void => {
                 if (!!this._onSuccessCallback) {
                     this._onSuccessCallback(response)
                 }
+                this._state = 'Success'
+                this._onStateChangeHandle()
             })
             .catch((error: any): void => {
-                errorValue = error.response
                 if (!!this._onErrorCallback) {
                     this._onErrorCallback(error.response)
                 }
+                this._state = 'Error'
+                this._onStateChangeHandle()
             })
             .finally((): void => {
                 this.processing = false
@@ -689,7 +720,5 @@ export class QueryBuilder extends HttpRequests {
                     this._onFinishCallback()
                 }
             })
-
-        return errorValue ? Promise.reject(null) : Promise.resolve()
     }
 }

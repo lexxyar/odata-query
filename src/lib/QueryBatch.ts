@@ -1,9 +1,9 @@
 import {QueryBuilder} from "./QueryBuilder";
 import {
     CallbackFunctionOneParamBatch,
-    QueryRequestOptions
+    QueryRequestOptions, TQueryBuilderState
 } from "./QueryContracts";
-import {AxiosResponse, Method} from "axios";
+import {Method} from "axios";
 import {HttpRequestState} from "../Contracts/HttpRequestState";
 
 export class QueryBatch extends HttpRequestState {
@@ -47,9 +47,13 @@ export class QueryBatch extends HttpRequestState {
                 //         resolve(null)
                 //     })
 
-                qb.submit(method, options)
-                    .then(() => resolve())
-                    .catch(() => reject(null))
+                qb.onStateChangeInternal((state: TQueryBuilderState) => {
+                    if (state === 'Error') reject(null)
+                    if (state === 'Success') resolve()
+                })
+                    .submit(method, options)
+                //     .then(() => resolve())
+                //     .catch(() => reject(null))
             }))
         })
 
