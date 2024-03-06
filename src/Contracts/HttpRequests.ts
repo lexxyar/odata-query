@@ -1,22 +1,21 @@
 import {
     CallbackFunctionDownloadProgress,
-    CallbackFunctionNoParams,
-    CallbackFunctionOneParam, CallbackFunctionUploadProgress,
+    CallbackFunctionOneParam,
+    CallbackFunctionUploadProgress,
     QueryRequestOptions
 } from "../lib/QueryContracts";
-import {AxiosProgressEvent, Method} from "axios";
+import {AxiosResponse, Method} from "axios";
+import {HttpRequestState} from "./HttpRequestState";
 
-export abstract class HttpRequests {
-    protected _onErrorCallback: CallbackFunctionOneParam | null = null
-    protected _onSuccessCallback: any | null = null
-    protected _onStartCallback: CallbackFunctionNoParams | null = null
-    protected _onFinishCallback: CallbackFunctionNoParams | null = null
+export abstract class HttpRequests extends HttpRequestState {
+    protected _onSuccessCallback: CallbackFunctionOneParam | null = null
     protected _onUploadProgressCallback: CallbackFunctionUploadProgress | null = null
     protected _onDownloadProgressCallback: CallbackFunctionDownloadProgress | null = null
 
     public abstract submit(method: Method, options?: Partial<QueryRequestOptions>): void
 
     public constructor() {
+        super()
     }
 
     public onUploadProgress(fn: CallbackFunctionUploadProgress): this {
@@ -29,24 +28,16 @@ export abstract class HttpRequests {
         return this
     }
 
-    public onError(fn: CallbackFunctionOneParam): this {
-        this._onErrorCallback = fn
-        return this
+    public callOnError(response: AxiosResponse<any, any>): void {
+        if (this._onErrorCallback) {
+            this._onErrorCallback(response)
+        }
     }
 
-    public onSuccess(fn: any): this {
-        this._onSuccessCallback = fn
-        return this
-    }
-
-    public onStart(fn: CallbackFunctionNoParams): this {
-        this._onStartCallback = fn
-        return this
-    }
-
-    public onFinish(fn: CallbackFunctionNoParams): this {
-        this._onFinishCallback = fn
-        return this
+    public callOnSuccess(response: AxiosResponse<any, any>): void {
+        if (this._onSuccessCallback) {
+            this._onSuccessCallback(response)
+        }
     }
 
     public get(options?: Partial<QueryRequestOptions>): void {

@@ -1,14 +1,12 @@
 import {QueryBuilder} from "./QueryBuilder";
 import {
-    CallbackFunctionNoParams,
-    CallbackFunctionOneParam,
     CallbackFunctionOneParamBatch,
     QueryRequestOptions
 } from "./QueryContracts";
 import {AxiosResponse, Method} from "axios";
-import {HttpRequests} from "../Contracts/HttpRequests";
+import {HttpRequestState} from "../Contracts/HttpRequestState";
 
-export class QueryBatch extends HttpRequests{
+export class QueryBatch extends HttpRequestState {
     protected _requests: QueryBuilder[] = []
     protected _onSuccessCallback: CallbackFunctionOneParamBatch | null = null
 
@@ -22,7 +20,7 @@ export class QueryBatch extends HttpRequests{
     }
 
     public constructor(requests: QueryBuilder[] = []) {
-        super();
+        super()
         this._requests = [...requests]
     }
 
@@ -41,9 +39,11 @@ export class QueryBatch extends HttpRequests{
         this._requests.map((qb: QueryBuilder): void => {
             promises.push(new Promise<unknown>((resolve: any, reject: any): void => {
                 qb.onError((response: AxiosResponse<any, any>): void => {
+                    qb.callOnError(response)
                     reject(response)
                 })
-                    .onSuccess((): void => {
+                    .onSuccess((response: AxiosResponse<any, any>): void => {
+                        qb.callOnSuccess(response)
                         resolve(null)
                     })
 

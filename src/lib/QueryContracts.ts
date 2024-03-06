@@ -7,6 +7,11 @@ type MethodsHeaders = Partial<{
 } & { common: AxiosHeaders }>;
 
 export type CallbackFunctionNoParams = () => void
+
+// export interface CallbackFunctionOneParam<T1 = AxiosResponse<any, any>, T2 = void> {
+//     (param: T1): T2;
+// }
+
 export type CallbackFunctionOneParam = (response: AxiosResponse<any, any>) => void
 export type CallbackFunctionUploadProgress = (event: AxiosProgressEvent) => void
 export type CallbackFunctionDownloadProgress = (event: AxiosProgressEvent) => void
