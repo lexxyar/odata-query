@@ -4,7 +4,7 @@ import {
     CallbackFunctionUploadProgress,
     QueryRequestOptions
 } from "../lib/QueryContracts";
-import {AxiosResponse, Method} from "axios";
+// import {AxiosResponse, Method} from "axios";
 import {HttpRequestState} from "./HttpRequestState";
 
 export abstract class HttpRequests extends HttpRequestState {
@@ -26,17 +26,17 @@ export abstract class HttpRequests extends HttpRequestState {
         return this
     }
 
-    public callOnError(response: AxiosResponse<any, any>): void {
-        if (this._onErrorCallback) {
-            this._onErrorCallback(response)
-        }
-    }
-
-    public callOnSuccess(response: AxiosResponse<any, any>): void {
-        if (this._onSuccessCallback) {
-            this._onSuccessCallback(response)
-        }
-    }
+    // public callOnError(response: AxiosResponse<any, any>): void {
+    //     if (this._onErrorCallback) {
+    //         this._onErrorCallback(response)
+    //     }
+    // }
+    //
+    // public callOnSuccess(response: AxiosResponse<any, any>): void {
+    //     if (this._onSuccessCallback) {
+    //         this._onSuccessCallback(response)
+    //     }
+    // }
 
 
 }

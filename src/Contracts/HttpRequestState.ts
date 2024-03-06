@@ -1,5 +1,5 @@
 import {CallbackFunctionNoParams, CallbackFunctionOneParam, QueryRequestOptions} from "../lib/QueryContracts";
-import {Method} from "axios";
+import {AxiosResponse, Method} from "axios";
 
 export abstract class HttpRequestState {
     protected _onErrorCallback: CallbackFunctionOneParam | null = null
@@ -7,7 +7,7 @@ export abstract class HttpRequestState {
     protected _onStartCallback: CallbackFunctionNoParams | null = null
     protected _onFinishCallback: CallbackFunctionNoParams | null = null
 
-    public abstract submit(method: Method, options?: Partial<QueryRequestOptions>): void
+    public abstract submit(method: Method, options?: Partial<QueryRequestOptions>): Promise<void> | void
 
     public onError(fn: CallbackFunctionOneParam): this {
         this._onErrorCallback = fn
@@ -29,23 +29,23 @@ export abstract class HttpRequestState {
         return this
     }
 
-    public get(options?: Partial<QueryRequestOptions>): void {
-        this.submit('get', options)
+    public get(options?: Partial<QueryRequestOptions>): Promise<void> | void {
+        return this.submit('get', options);
     }
 
-    public put(options?: Partial<QueryRequestOptions>): void {
-        this.submit('put', options)
+    public put(options?: Partial<QueryRequestOptions>): Promise<void> | void {
+        return this.submit('put', options);
     }
 
-    public post(options?: Partial<QueryRequestOptions>): void {
-        this.submit('post', options)
+    public post(options?: Partial<QueryRequestOptions>): Promise<void> | void {
+        return this.submit('post', options);
     }
 
-    public delete(options?: Partial<QueryRequestOptions>): void {
-        this.submit('delete', options)
+    public delete(options?: Partial<QueryRequestOptions>): Promise<void> | void {
+        return this.submit('delete', options);
     }
 
-    public options(options ?: Partial<QueryRequestOptions>): void {
-        this.submit('options', options)
+    public options(options ?: Partial<QueryRequestOptions>): Promise<void> | void {
+        return this.submit('options', options);
     }
 }

@@ -38,32 +38,18 @@ export class QueryBatch extends HttpRequestState {
 
         this._requests.map((qb: QueryBuilder): void => {
             promises.push(new Promise<unknown>((resolve: any, reject: any): void => {
-                qb.onError((response: AxiosResponse<any, any>): void => {
-                    qb.callOnError(response)
-                    reject(response)
-                })
-                    .onSuccess((response: AxiosResponse<any, any>): void => {
-                        qb.callOnSuccess(response)
-                        resolve(null)
-                    })
+                // qb.onError((response: AxiosResponse<any, any>): void => {
+                //     // qb.callOnError(response)
+                //     reject(response)
+                // })
+                //     .onSuccess((response: AxiosResponse<any, any>): void => {
+                //         // qb.callOnSuccess(response)
+                //         resolve(null)
+                //     })
 
-                switch (method) {
-                    case 'delete':
-                        qb.delete(options)
-                        break;
-                    case 'get':
-                        qb.get(options)
-                        break;
-                    case 'post':
-                        qb.post(options)
-                        break;
-                    case 'put':
-                        qb.put(options)
-                        break;
-                    case 'options':
-                        qb.options(options)
-                        break;
-                }
+                qb.submit(method, options)
+                    .then(() => resolve())
+                    .catch(() => reject(null))
             }))
         })
 

@@ -641,7 +641,7 @@ export class QueryBuilder extends HttpRequests {
         return qb
     }
 
-    public submit(method: Method, options?: Partial<QueryRequestOptions>): void {
+    public submit(method: Method, options?: Partial<QueryRequestOptions>): Promise<void> {
         let axiosInstance: Axios = QueryBuilder.axios
         if (options?.baseUrl) {
             axiosInstance = cloneDeep(QueryBuilder.axios)
@@ -664,12 +664,13 @@ export class QueryBuilder extends HttpRequests {
 
         if (!!this._onUploadProgressCallback) {
             // @ts-ignore
-            axiosOptions.onUploadProgress = (e:AxiosProgressEvent)=>this._onUploadProgressCallback(e, this._uid)
+            axiosOptions.onUploadProgress = (e: AxiosProgressEvent) => this._onUploadProgressCallback(e, this._uid)
         }
         if (!!this._onDownloadProgressCallback) {
             axiosOptions.onDownloadProgress = this._onDownloadProgressCallback
         }
 
+        let errorValue: any = false
         axiosInstance.request(axiosOptions)
             .then((response: AxiosResponse<any, any>): void => {
                 if (!!this._onSuccessCallback) {
@@ -677,6 +678,7 @@ export class QueryBuilder extends HttpRequests {
                 }
             })
             .catch((error: any): void => {
+                errorValue = error.response
                 if (!!this._onErrorCallback) {
                     this._onErrorCallback(error.response)
                 }
@@ -687,5 +689,7 @@ export class QueryBuilder extends HttpRequests {
                     this._onFinishCallback()
                 }
             })
+
+        return errorValue ? Promise.reject(null) : Promise.resolve()
     }
 }
