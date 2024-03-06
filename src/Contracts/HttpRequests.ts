@@ -12,8 +12,6 @@ export abstract class HttpRequests extends HttpRequestState {
     protected _onUploadProgressCallback: CallbackFunctionUploadProgress | null = null
     protected _onDownloadProgressCallback: CallbackFunctionDownloadProgress | null = null
 
-    public abstract submit(method: Method, options?: Partial<QueryRequestOptions>): void
-
     public constructor() {
         super()
     }
@@ -40,23 +38,5 @@ export abstract class HttpRequests extends HttpRequestState {
         }
     }
 
-    public get(options?: Partial<QueryRequestOptions>): void {
-        this.submit('get', options)
-    }
 
-    public put(options?: Partial<QueryRequestOptions>): void {
-        this.submit('put', options)
-    }
-
-    public post(options?: Partial<QueryRequestOptions>): void {
-        this.submit('post', options)
-    }
-
-    public delete(options?: Partial<QueryRequestOptions>): void {
-        this.submit('delete', options)
-    }
-
-    public options(options ?: Partial<QueryRequestOptions>): void {
-        this.submit('options', options)
-    }
 }
