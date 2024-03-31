@@ -22,6 +22,10 @@ export class QueryOrder {
         return this._field
     }
 
+    public getDirection(): QueryOrderDirection {
+        return this._direction
+    }
+
     public asc(value: boolean = true): this {
         this._direction = value ? QueryOrderDirection.ASC : QueryOrderDirection.DESC
         return this
@@ -31,7 +35,11 @@ export class QueryOrder {
         return this.asc(!value)
     }
 
-    toString(): string {
+    public toString(): string {
         return `${this._field} ${this._direction}`
+    }
+
+    public toJson(): object {
+        return {field: this._field, direction: this._direction}
     }
 }

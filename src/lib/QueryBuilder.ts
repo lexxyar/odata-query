@@ -5,11 +5,13 @@ import {QueryExpand} from "./QueryExpand";
 import {QueryFilter} from "./QueryFilter";
 import {QueryFilterSign} from "./QueryFilterSign";
 import {QueryFilterConcatenate} from "./QueryFilterConcatenate";
-import axios, {Axios, AxiosProgressEvent, AxiosRequestConfig, AxiosResponse, Method} from "axios";
+import axios, {Axios, AxiosRequestConfig, AxiosResponse, Method} from "axios";
 import {
-    CallbackFunctionOneParam, CallbackFunctionStateChange,
+    CallbackFunctionOneParam,
+    CallbackFunctionStateChange,
     IParserFilterStructure,
-    QueryRequestOptions, TQueryBuilderState
+    QueryRequestOptions,
+    TQueryBuilderState
 } from "./QueryContracts";
 import {HttpRequests} from "../Contracts/HttpRequests";
 
@@ -720,5 +722,23 @@ export class QueryBuilder extends HttpRequests {
                     this._onFinishCallback()
                 }
             })
+    }
+
+    public getOrder(): QueryOrder[] {
+        return this._order
+    }
+
+    public reverseOrder(fieldName: string, addIfNotExists: boolean = true): this {
+        const order: QueryOrder | undefined = this._order.find((e: QueryOrder): boolean => e.getField() === fieldName)
+        if (order !== undefined) {
+            const asc: boolean = order.getDirection() === QueryOrderDirection.ASC
+            order.asc(!asc)
+
+        } else {
+            if (addIfNotExists) {
+                this.order(fieldName)
+            }
+        }
+        return this
     }
 }
